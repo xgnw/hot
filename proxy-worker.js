@@ -112,7 +112,9 @@ export default {
     if (request.method !== 'GET') return fail('仅支持 GET', 405);
 
     const url = new URL(request.url);
-    if (url.pathname === '/health' || url.pathname === '/') {
+    // 健康检查仅在 /health，或「根路径且没有 url 参数」时返回；
+    // 带 url 参数的根路径 /?url= 必须走代理——这是前端「CORS 代理前缀」的实际用法。
+    if (url.pathname === '/health' || (url.pathname === '/' && !url.searchParams.get('url'))) {
       return json({
         ok: true,
         service: 'rebang-cors-proxy',
